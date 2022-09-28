@@ -21,7 +21,6 @@ type uriResult struct {
 type Widget struct {
 	view.TextWidget
 
-	// result   string
 	settings *Settings
 	uriList  []uriResult
 }
@@ -48,7 +47,6 @@ func NewWidget(tviewApp *tview.Application, redrawChan chan bool, settings *Sett
 // Refresh updates the onscreen contents of the widget
 func (widget *Widget) Refresh() {
 	widget.check()
-	// The last call should always be to the display function
 	widget.display()
 }
 
@@ -70,7 +68,6 @@ func (widget *Widget) content() string {
 	return content
 }
 
-// this method reads the config and calls ipinfo for ip information
 func (widget *Widget) check() {
 
 	for _, ur := range widget.uriList {
@@ -98,12 +95,10 @@ func (widget *Widget) sanitize() {
 		u, err := url.ParseRequestURI(line)
 		if err != nil {
 			if len(line) == 0 {
-				// fmt.Println("Received an empty line")
 				uResult.resultMessage = "empty"
 				uResult.resultCode = 0
 				uResult.valid = false
 			} else {
-				// fmt.Println("Invalid uri:", line)
 				uResult.resultMessage = "invalid"
 				uResult.resultCode = 0
 				uResult.valid = false
@@ -112,7 +107,7 @@ func (widget *Widget) sanitize() {
 			uResult.raw = u
 			uResult.valid = true
 		}
-		// Store the uri
+
 		widget.uriList = append(widget.uriList, uResult)
 	}
 }
