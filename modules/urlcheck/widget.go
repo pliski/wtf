@@ -1,4 +1,4 @@
-package ipinfo
+package urlcheck
 
 import (
 	"fmt"
@@ -26,11 +26,12 @@ type Widget struct {
 	uriList  []uriResult
 }
 
+// NewWidget creates and returns an instance of Widget
 func NewWidget(tviewApp *tview.Application, redrawChan chan bool, settings *Settings) *Widget {
 	maxUri := len(settings.paramList)
 
 	widget := Widget{
-		TextWidget: view.NewTextWidget(tviewApp, redrawChan, nil, settings.Common),
+		TextWidget: view.NewTextWidget(tviewApp, redrawChan, nil, settings.common),
 
 		settings: settings,
 		uriList:  make([]uriResult, maxUri),
@@ -42,23 +43,31 @@ func NewWidget(tviewApp *tview.Application, redrawChan chan bool, settings *Sett
 	return &widget
 }
 
+/* -------------------- Exported Functions -------------------- */
+
+// Refresh updates the onscreen contents of the widget
 func (widget *Widget) Refresh() {
 	widget.check()
-
-	// widget.Redraw(func() (string, string, bool) { return widget.CommonSettings().Title, widget.result, false })
-
-	widget.Redraw(widget.content)
+	// The last call should always be to the display function
+	widget.display()
 }
 
-func (widget *Widget) content() (string, string, bool) {
+/* -------------------- Unexported Functions -------------------- */
+
+func (widget *Widget) display() {
+	widget.Redraw(func() (string, string, bool) {
+		return widget.CommonSettings().Title, widget.content(), false
+	})
+}
+
+func (widget *Widget) content() string {
 
 	content := ""
 	for _, ur := range widget.uriList {
-
-		content += fmt.Sprintf("%s: [%d] %s", ur.setting, ur.resultCode, ur.resultMessage)
+		content += fmt.Sprintf("%s: [%d] %s\n", ur.setting, ur.resultCode, ur.resultMessage)
 	}
 
-	return widget.CommonSettings().Title, content, true
+	return content
 }
 
 // this method reads the config and calls ipinfo for ip information
