@@ -27,6 +27,11 @@ func (widget *Widget) parseTemplate() *template.Template {
 }
 
 func (widget *Widget) FormatResult() string {
+
+	if len(widget.urlList) < 1 {
+		return "empty URL list"
+	}
+
 	t := widget.parseTemplate()
 	resultBuffer := new(bytes.Buffer)
 	err := t.Execute(resultBuffer, widget.urlList)
