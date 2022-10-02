@@ -21,10 +21,11 @@ func GetClient() *http.Client {
 }
 
 func DoRequest(urlRequest string, timeout time.Duration, client *http.Client) (int, string) {
-	// Request
+	// Context
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	// Request
 	req, err := http.NewRequest(http.MethodHead, urlRequest, nil)
 	if err != nil {
 		logger.Log(fmt.Sprintf("[urlcheck] ERROR %s: %s", urlRequest, err.Error()))

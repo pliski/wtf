@@ -13,20 +13,20 @@ type Widget struct {
 	view.TextWidget
 
 	settings *Settings
-	uriList  []*uriResult
+	urlList  []*urlResult
 	client   *http.Client
 	timeout  time.Duration
 }
 
 // NewWidget creates and returns an instance of Widget
 func NewWidget(tviewApp *tview.Application, redrawChan chan bool, settings *Settings) *Widget {
-	maxUri := len(settings.urls)
+	maxUrl := len(settings.urls)
 
 	widget := Widget{
 		TextWidget: view.NewTextWidget(tviewApp, redrawChan, nil, settings.common),
 
 		settings: settings,
-		uriList:  make([]*uriResult, maxUri),
+		urlList:  make([]*urlResult, maxUrl),
 		client:   GetClient(),
 		timeout:  time.Duration(settings.requestTimeout) + time.Second,
 	}
@@ -55,8 +55,8 @@ func (widget *Widget) display() {
 
 func (widget *Widget) content() string {
 	content := ""
-	for _, ur := range widget.uriList {
-		if ur.resultCode == 0 && ur.valid {
+	for _, ur := range widget.urlList {
+		if ur.resultCode == 0 && ur.isValid {
 			ur.resultMessage = "wait..."
 		}
 		// content += fmt.Sprintf("%s: [%d] %s\n", ur.setting, ur.resultCode, ur.resultMessage)
@@ -66,8 +66,8 @@ func (widget *Widget) content() string {
 }
 
 func (widget *Widget) check() {
-	for _, urlRes := range widget.uriList {
-		if urlRes.valid {
+	for _, urlRes := range widget.urlList {
+		if urlRes.isValid {
 			urlRes.resultCode, urlRes.resultMessage = DoRequest(urlRes.url, widget.timeout, widget.client)
 		}
 	}
@@ -75,6 +75,6 @@ func (widget *Widget) check() {
 
 func (widget *Widget) init() {
 	for i, urlString := range widget.settings.urls {
-		widget.uriList[i] = newUriResult(urlString)
+		widget.urlList[i] = newUrlResult(urlString)
 	}
 }
