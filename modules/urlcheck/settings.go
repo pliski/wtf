@@ -9,6 +9,7 @@ package urlcheck
 // 		- www.pli.ski
 // 		- http://www.pli.ski
 // 		- http://www.nope.nope
+// 		- https://httpbin.org/status/500
 // 	position:
 // 		top: 0
 // 		left: 0
@@ -28,7 +29,7 @@ const (
 )
 
 type Settings struct {
-	common *cfg.Common
+	Common *cfg.Common
 
 	requestTimeout int      `help:"Max Request duration in seconds"`
 	urls           []string `help:"A list of url to check"`
@@ -36,7 +37,7 @@ type Settings struct {
 
 func NewSettingsFromYAML(name string, ymlConfig *config.Config, globalConfig *config.Config) *Settings {
 	settings := Settings{
-		common: cfg.NewCommonSettingsFromModule(name, defaultTitle, defaultFocusable, ymlConfig, globalConfig),
+		Common: cfg.NewCommonSettingsFromModule(name, defaultTitle, defaultFocusable, ymlConfig, globalConfig),
 
 		requestTimeout: ymlConfig.UInt("timeout", 30),
 	}

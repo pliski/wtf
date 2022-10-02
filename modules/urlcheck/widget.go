@@ -1,8 +1,8 @@
 package urlcheck
 
 import (
-	"fmt"
 	"net/http"
+	"text/template"
 	"time"
 
 	"github.com/rivo/tview"
@@ -12,10 +12,12 @@ import (
 type Widget struct {
 	view.TextWidget
 
-	settings *Settings
-	urlList  []*urlResult
-	client   *http.Client
-	timeout  time.Duration
+	settings         *Settings
+	urlList          []*urlResult
+	client           *http.Client
+	timeout          time.Duration
+	PreparedTemplate *template.Template
+	templateString   string
 }
 
 // NewWidget creates and returns an instance of Widget
@@ -23,13 +25,15 @@ func NewWidget(tviewApp *tview.Application, redrawChan chan bool, settings *Sett
 	maxUrl := len(settings.urls)
 
 	widget := Widget{
-		TextWidget: view.NewTextWidget(tviewApp, redrawChan, nil, settings.common),
+		TextWidget: view.NewTextWidget(tviewApp, redrawChan, nil, settings.Common),
 
 		settings: settings,
 		urlList:  make([]*urlResult, maxUrl),
 		client:   GetClient(),
 		timeout:  time.Duration(settings.requestTimeout) + time.Second,
 	}
+
+	widget.PrepareTemplate()
 
 	widget.View.SetWrap(false)
 	widget.init()
@@ -47,34 +51,22 @@ func (widget *Widget) Refresh() {
 
 /* -------------------- Unexported Functions -------------------- */
 
-func (widget *Widget) display() {
-	widget.Redraw(func() (string, string, bool) {
-		return widget.CommonSettings().Title, widget.content(), false
-	})
-}
-
-func (widget *Widget) content() string {
-	content := ""
-	for _, ur := range widget.urlList {
-		if ur.resultCode == 0 && ur.isValid {
-			ur.resultMessage = "wait..."
-		}
-		// content += fmt.Sprintf("%s: [%d] %s\n", ur.setting, ur.resultCode, ur.resultMessage)
-		content += fmt.Sprintf("%s: %s\n", ur.url, ur.resultMessage)
-	}
-	return content
-}
-
-func (widget *Widget) check() {
-	for _, urlRes := range widget.urlList {
-		if urlRes.isValid {
-			urlRes.resultCode, urlRes.resultMessage = DoRequest(urlRes.url, widget.timeout, widget.client)
-		}
-	}
-}
-
 func (widget *Widget) init() {
 	for i, urlString := range widget.settings.urls {
 		widget.urlList[i] = newUrlResult(urlString)
 	}
+}
+
+func (widget *Widget) check() {
+	for _, urlRes := range widget.urlList {
+		if urlRes.IsValid {
+			urlRes.ResultCode, urlRes.ResultMessage = DoRequest(urlRes.Url, widget.timeout, widget.client)
+		}
+	}
+}
+
+func (widget *Widget) display() {
+	widget.Redraw(func() (string, string, bool) {
+		return widget.CommonSettings().Title, widget.FormatResult(), false
+	})
 }

@@ -7,33 +7,33 @@ import (
 const InvalidResultCode = 999
 
 type urlResult struct {
-	url           string
-	resultCode    int
-	resultMessage string
-	isValid       bool
+	Url           string
+	ResultCode    int
+	ResultMessage string
+	IsValid       bool
 }
 
 func newUrlResult(urlString string) *urlResult {
 
 	uResult := urlResult{
-		url: urlString,
+		Url: urlString,
 	}
 
 	if len(urlString) == 0 {
-		uResult.resultMessage = "Empty url"
-		uResult.resultCode = InvalidResultCode
-		uResult.isValid = false
+		uResult.ResultMessage = "Empty url"
+		uResult.ResultCode = InvalidResultCode
+		uResult.IsValid = false
 		return &uResult
 	}
 
 	_, err := url.ParseRequestURI(urlString)
 	if err != nil {
-		uResult.resultMessage = "Invalid url"
-		uResult.resultCode = InvalidResultCode
-		uResult.isValid = false
+		uResult.ResultMessage = "Invalid url"
+		uResult.ResultCode = InvalidResultCode
+		uResult.IsValid = false
 		return &uResult
 	}
 
-	uResult.isValid = true
+	uResult.IsValid = true
 	return &uResult
 }
