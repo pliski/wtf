@@ -13,14 +13,16 @@ const (
 type Settings struct {
 	common *cfg.Common
 
-	paramList []string `help:"A list of uri to check"`
+	requestTimeout int
+	urls           []string `help:"A list of uri to check"`
 }
 
 func NewSettingsFromYAML(name string, ymlConfig *config.Config, globalConfig *config.Config) *Settings {
 	settings := Settings{
 		common: cfg.NewCommonSettingsFromModule(name, defaultTitle, defaultFocusable, ymlConfig, globalConfig),
-	}
-	settings.paramList = cfg.ParseAsMapOrList(ymlConfig, "paramList")
 
+		requestTimeout: ymlConfig.UInt("requestTimeout", 30),
+	}
+	settings.urls = cfg.ParseAsMapOrList(ymlConfig, "urls")
 	return &settings
 }
