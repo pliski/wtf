@@ -1,5 +1,22 @@
 package urlcheck
 
+// Example config
+//
+// urlcheck:
+// 	timeout: 1
+// 	urls:
+// 		- pli.ski
+// 		- www.pli.ski
+// 		- http://www.pli.ski
+// 		- http://www.nope.nope
+// 	position:
+// 		top: 0
+// 		left: 0
+// 		height: 2
+// 		width: 3
+// 	refreshInterval: 40
+// 	enabled: true
+
 import (
 	"github.com/olebedev/config"
 	"github.com/wtfutil/wtf/cfg"
